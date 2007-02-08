@@ -8,6 +8,7 @@ class post
 	var $file		= 	null;
 	var $password	=	'';
 	
+	var $board		=	null;
 	var $mysql		= 	null;
 	
 	function __constructor($connection)
