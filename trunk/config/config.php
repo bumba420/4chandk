@@ -5,10 +5,10 @@
 */
 
 // Database information
-$config['db_server']	=		'localhost';
-$config['db_user']		=		'';
-$config['db_password']	=		'';
-$config['db_database']	=		'';
+config::set('db_server', 'mysql19.servage.net');
+config::set('db_user', 'bottiger_4chandk');
+config::set('db_password', '');
+config::set('db_database', 'bottiger_4chandk');
 
 /*
 -------- You May Change These! -----------

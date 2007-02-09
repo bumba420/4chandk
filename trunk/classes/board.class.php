@@ -5,7 +5,7 @@ class board {
 	public $description	= 	'';
 	public $banner		=	'';
 	
-	function __constructor () 
+	function __construct() 
 	{
 		return;
 	}
