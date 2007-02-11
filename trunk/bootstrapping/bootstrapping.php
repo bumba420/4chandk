@@ -10,10 +10,12 @@ foreach ($config as $key => $value)
 unset($config);
 */
 // Connect to the database:
+/*
 $mysqli = new mysqli(config::get('db_server'), 
 					config::get('db_user'), 
 					config::get('db_password'), 
 					config::get('db_database')
 					);
-
+*/
+$mysqli = new Database();
 ?>

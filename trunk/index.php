@@ -13,16 +13,16 @@ Hello World!
 
 <?php
 
-$post = new post($mysqli, '11title', '22name', '33email', '44message', '55password', '66file');
+$post = new Post(4, 55, 545, '11title', '22name', '33email', '44message', '55password', '66file');
 
 echo '<hr />'.$post->getEmail();
-
-if ($post->savePost())
+echo '<hr />'.$post->getId();
+/*if ($post->deletePost())
 {
 	echo "wee";
 }
 else 
 {	
 	echo "not so weee";
-}
+}*/
 ?>

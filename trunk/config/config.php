@@ -5,10 +5,10 @@
 */
 
 // Database information
-config::set('db_server', 'mysql19.servage.net');
-config::set('db_user', 'bottiger_4chandk');
-config::set('db_password', '');
-config::set('db_database', 'bottiger_4chandk');
+Config::set('db_server', 'mysql19.servage.net');
+Config::set('db_user', 'bottiger_4chandk');
+Config::set('db_password', 'fun4all');
+Config::set('db_database', 'bottiger_4chandk');
 
 /*
 -------- You May Change These! -----------
