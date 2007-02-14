@@ -1,21 +1,20 @@
 <?php
 class Post
 {
-	var $id			=	0;
-	var $parent_id	=	0;
-	var $thread_id	= 	0;
-	var $board_id	=	0;
-	var $title		=	'';
-	var $name		=	'';
-	var $email		= 	'';
-	var $password	=	'';
-	var $message	= 	'';
-	var $file		= 	null;
-	var $posted_at	=	0;
-	var $ip			= 	'';
+	private $id			=	0;
+	private $thread_id	= 	0;
+	private $board_id	=	0;
+	private $title		=	'';
+	private $name		=	'';
+	private $email		= 	'';
+	private $password	=	'';
+	private $message	= 	'';
+	private $file		= 	null;
+	private $posted_at	=	0;
+	private $ip			= 	'';
 	
-	var $board		=	null;
-	var $data		= 	false;
+	private $board		=	null;
+	private $data		= 	false;
 	
 	function __construct()
 	{
@@ -60,10 +59,16 @@ class Post
 		$this->data	=	true;
 	}
 
-	private function getByArgs($thread_id, $parent_id, $board_id, $title, $name, $email, $message, $password, $file)
+	private function getByArgs($thread_id, 
+							   $board_id, 
+							   $title, 
+							   $name, 
+							   $email, 
+							   $message, 
+							   $password, 
+							   $file)
 	{
 		$this->thread_id	= $thread_id;
-		$this->parent_id	= $parent_id;
 		$this->board_id 	= $board_id;
 		$this->title 		= $title;
 		$this->name			= $name;
@@ -78,7 +83,6 @@ class Post
 	function savePost()
 	{
 		return Database::singleton()->query("INSERT INTO posts (thread_id,
-												parent_id,
 												board_id,
 												title, 
 												name, 
@@ -90,7 +94,6 @@ class Post
 												posted_at
 												) VALUES (
 												".$this->thread_id.",
-												".$this->parent_id.",
 												".$this->board_id.",
 												'".$this->title."', 
 												'".$this->name."', 

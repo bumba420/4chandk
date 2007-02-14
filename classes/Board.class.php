@@ -10,7 +10,7 @@ class Board {
 	private  $threads 			= 	array();
 	private  $section_id		=	NULL;
 	
-	private  $data				= false;
+	private  $data				=	false;
 	
 	function __construct($id) 
 	{
@@ -24,23 +24,24 @@ class Board {
 		 
 		$query	=	"SELECT id 
 					FROM ".Config::get('post_relation')." 
-					WHERE board_id = ? 
+					WHERE board_id = ".$this->id." 
 					AND thread_id IS NULL 
 					ORDER BY id ASC
-					LIMIT ".$amount.",".$offset;
+					LIMIT ".$offset.",".$amount;
 		
+		//echo $query;
 		if ($stmt = Database::singleton()->prepare($query)) {
-			$stmt->bind_param("i", $this->id);
+			//$stmt->bind_param("i", $this->id);
 			$stmt->execute();
 			$stmt->bind_result($id);
 		
 			while ($stmt->fetch())
 			{
-				$threads[] = new Thread($id);
+				$this->threads[] = new Thread($id);
 			}
 		}
 	
-		return $threads;
+		return $this->threads;
 	}
 	
 	function deleteBoard($id)
@@ -80,7 +81,6 @@ class Board {
 	function getName()
 	{
 		if (!$this->data) {	$this->getData(); }
-		//die("lol".$this->name);
 		return $this->name;
 	}
 	

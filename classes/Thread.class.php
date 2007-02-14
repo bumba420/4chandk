@@ -1,10 +1,10 @@
 <?php
 class Thread 
 {
-	var $thread_id			=	'';
-	var $board_id			= 	'';
-	var $first_post			=	NULL;
-	var $posts				= 	NULL; // does this take up a lot of unneccassry memory?
+	private  $thread_id			=	'';
+	private  $board_id			= 	'';
+	private  $first_post			=	NULL;
+	private  $posts				= 	NULL; // does this take up a lot of unneccassry memory?
 	
 	public function __construct($id)
 	{
@@ -21,19 +21,19 @@ class Thread
 		if (is_null($this->posts))
 		{
 			$posts = array();
-		
-			$stmt = Database::singleton()->prepare("SELECT * 
-										   FROM ".Config::get('post_relation')." 
-										   WHERE theard_id = ? 
-										   OR id = ? 
-										   ORDER BY id ASC");
-			$stmt->bind_param("ii", $this->thread_id, $this->thread_id);
+			$query = "SELECT board_id, title, name, email, message, password, filename 
+					  FROM ".Config::get('post_relation')." 
+					  WHERE thread_id = ".$this->thread_id." 
+					  OR id = ".$this->thread_id." 
+					  ORDER BY id ASC";
+
+			$stmt = Database::singleton()->prepare($query);
 			$stmt->execute();
-			$stmt->bind_result($title, $name, $email, $message, $password, $file);
+			$stmt->bind_result($board_id, $title, $name, $email, $message, $password, $file);
 		
 			while ($stmt->fetch())
 			{
-				$posts[] = new Post($title, $name, $email, $message, $password, $file);
+				$posts[] = new Post($this->thread_id, $title, $name, $email, $message, $password, $file);
 			}
 		
 			$this->first_post	= $posts[0];
@@ -80,6 +80,11 @@ class Thread
 	public function deletePost($id)
 	{
 		return Post::deletePost($id);
+	}
+	
+	public function getId()
+	{
+		return $this->thread_id;
 	}
 }
 ?>
