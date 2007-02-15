@@ -36,7 +36,8 @@ class Post
 							 		$args[4],
 							 		$args[5],
 							 		$args[6],
-							 		$args[7]
+							 		$args[7],
+							 		$args[8]
 							 		);
 		}
 	}
@@ -59,7 +60,8 @@ class Post
 		$this->data	=	true;
 	}
 
-	private function getByArgs($thread_id, 
+	private function getByArgs($id,
+							   $thread_id, 
 							   $board_id, 
 							   $title, 
 							   $name, 
@@ -68,6 +70,7 @@ class Post
 							   $password, 
 							   $file)
 	{
+		$this->id			= $id;
 		$this->thread_id	= $thread_id;
 		$this->board_id 	= $board_id;
 		$this->title 		= $title;
