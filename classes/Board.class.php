@@ -26,11 +26,12 @@ class Board {
 					FROM ".Config::get('post_relation')." 
 					WHERE board_id = ".$this->id." 
 					AND thread_id IS NULL 
-					ORDER BY id ASC
+					ORDER BY last_update DESC
 					LIMIT ".$offset.",".$amount;
 		
 		//echo $query;
-		if ($stmt = Database::singleton()->prepare($query)) {
+		if ($stmt = Database::singleton()->prepare($query)) 
+		{
 			//$stmt->bind_param("i", $this->id);
 			$stmt->execute();
 			$stmt->bind_result($id);
