@@ -5,9 +5,9 @@
 */
 
 // Database information
-Config::set('db_server', 'mysql19.servage.net');
+Config::set('db_server', '127.0.0.1');
 Config::set('db_user', 'bottiger_4chandk');
-Config::set('db_password', 'fun4all');
+Config::set('db_password', '');
 Config::set('db_database', 'bottiger_4chandk');
 
 // Password salt, just something long and random.
