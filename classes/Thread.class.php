@@ -86,5 +86,10 @@ class Thread
 	{
 		return $this->thread_id;
 	}
+	
+	function getReplyURL()
+	{
+		return '?thread='.$this->thread_id.'&mode=reply';
+	}
 }
 ?>
