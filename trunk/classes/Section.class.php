@@ -1,13 +1,13 @@
 <?php
 class Section
 {
-	var $id				=	'';
-	var $name			=	'';
-	var $order			=	0;
+	private  $id			=	'';
+	private  $name			=	'';
+	private  $order			=	0;
 	
-	var $boards			=   array();
+	private  $boards		=   array();
 	
-	var $data			=	false;
+	private  $data			=	false;
 	
 	function __construct($id)
 	{
@@ -95,6 +95,12 @@ class Section
 							  
 			$this->data		= true;
 		}
+	}
+	
+	function getId()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->id;
 	}
 	
 	function getName()

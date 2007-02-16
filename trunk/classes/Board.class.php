@@ -29,10 +29,9 @@ class Board {
 					ORDER BY last_update DESC
 					LIMIT ".$offset.",".$amount;
 		
-		//echo $query;
+
 		if ($stmt = Database::singleton()->prepare($query)) 
 		{
-			//$stmt->bind_param("i", $this->id);
 			$stmt->execute();
 			$stmt->bind_result($id);
 		

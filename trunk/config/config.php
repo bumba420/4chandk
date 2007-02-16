@@ -20,11 +20,15 @@ Config::set('salt', 'ZEEX8yhVYq80mylg8B5RLzDtnPa3tUclPf51TtsIfwDdaJd3');
 
 // Page title
 Config::set('page_title', '4chandk');
+Config::set('page_url',	'');
 
 // Default board options
 Config::set('post_pr_page', 20);
 Config::set('threads_pr_board', 500);
 Config::set('fored_anonymous', false);
+
+Config::set('image_max_width', 200);
+Config::set('image_max_height', 200);
 
 // language options
 Config::set('language', 'english');
@@ -45,7 +49,11 @@ Config::set('root_folder', $_SERVER['DOCUMENT_ROOT'].'/4chan');
 Config::set('tmp_folder', Config::get('root_folder').'/tmp');
 Config::set('cache_folder', Config::get('tmp_folder').'/cache');
 Config::set('image_folder', Config::get('tmp_folder').'/img');
+Config::set('thumbnail_folder', Config::get('tmp_folder').'/thumbnails');
 Config::set('language_folder', Config::get('root_folder').'/languages');
+
+Config::set('thumbnail_url', 'tmp/thumbnails');
+Config::set('image_url', 'tmp/img');
 
 // Name of database relations
 Config::set('board_relation', Config::get('database_prefix').'boards');
