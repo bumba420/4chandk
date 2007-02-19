@@ -6,6 +6,7 @@ class Post
 	private $board_id		=	0;
 	private $title			=	'';
 	private $name			=	'';
+	private $tripecode		=	'';
 	private $email			= 	'';
 	private $password		=	'';
 	private $message		= 	'';
@@ -26,7 +27,7 @@ class Post
 				
 		if (func_num_args() == 1)
 		{
-			return $this->getById($args[0]);
+			return $this->getById(intval($args[0]));
 		}
 		else 
 		{
@@ -38,7 +39,9 @@ class Post
 							 		$args[5],
 							 		$args[6],
 							 		$args[7],
-							 		$args[8]
+							 		$args[8],
+							 		$args[9],
+							 		$args[10]
 							 		);
 		}
 	}
@@ -53,7 +56,7 @@ class Post
 			while ($row = $result->fetch_assoc()) {
 				foreach ($row as $key => $value)
 				{
-					$this->$key	= $value;
+					$this->$key	= stripslashes($value);
 				}
 			}
 		}
@@ -66,31 +69,31 @@ class Post
 							   $board_id, 
 							   $title, 
 							   $name, 
+							   $tripecode,
 							   $email, 
 							   $message, 
 							   $password, 
+							   $posted_at,
 							   $file)
 	{
 		$this->id			=	$id;
 		$this->thread_id	=	$thread_id;
 		$this->board_id 	=	$board_id;
 		$this->title 		=	$title;
-		$this->name			=	$name;
+		$this->name			=	User::calcUsername($name);
+		$this->tripecode	=	$tripecode;
 		$this->email		=	$email;
 		$this->message		=	$message;
 		$this->password		=	$password;
-		$this->posted_at	=	time();
+		$this->posted_at	=	$posted_at;
 		$this->last_update	=	$this->posted_at;
 		$this->ip			=	$_SERVER['REMOTE_ADDR'];
 
-		//die(var_dump($file));
-		
 		if (is_uploaded_file($file['tmp_name']))
 		{
-			//die("hmmm ".var_dump($file));
 			$this->file		= 	new Image($file, $this->posted_at*100, 200, 200, 5000000, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
 		}
-		elseif (file_exists(Config::get('image_folder').'/'.$file))
+		elseif (is_file(Config::get('image_folder').'/'.$file))
 		{
 			$this->file		= 	new Image(null, $file, 200, 200, 5000000, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
 		}
@@ -100,13 +103,22 @@ class Post
 	
 	function savePost()
 	{
-		//die("internet: ".$this->file);
-		$thread_id = is_null($this->thread_id) ? "NULL" : $this->thread_id;
+		if (!$this->validatePost())
+		{
+			die("failed to validate");
+			return false;
+		}
 		
-		$query = "INSERT INTO posts (thread_id,
+		$thread_id 	= is_null($this->thread_id) ? "NULL" : $this->thread_id;
+		$filename	=	$this->file	? $this->file->getFilename() : '';
+		
+		$query = "INSERT INTO ".Config::get('post_relation')." (
+									id,
+									thread_id,
 									board_id,
 									title, 
-									name, 
+									name,
+									tripecode, 
 									email, 
 									password, 
 									message, 
@@ -114,24 +126,27 @@ class Post
 									ip, 
 									posted_at,
 									last_update
-									) VALUES (
-									".$thread_id.",
-									".$this->board_id.",
-									'".$this->title."', 
-									'".$this->name."', 
-									'".$this->email."', 
-									'".$this->password."', 
-									'".$this->message."', 
-									'".$this->file->getFilename()."', 
-									'".$_SERVER['REMOTE_ADDR']."', 
-									".$this->posted_at.",
-									".$this->last_update."
-									)";
-		
+									)
+									SELECT (MAX(id)+1),
+										   	".$thread_id.",
+											".intval($this->board_id).",
+											'".addslashes($this->title)."', 
+											'".addslashes($this->name)."', 
+											'".addslashes($this->tripecode)."', 
+											'".addslashes($this->email)."', 
+											'".addslashes($this->password)."', 
+											'".addslashes($this->message)."', 
+											'".addslashes($filename)."', 
+											'".$_SERVER['REMOTE_ADDR']."', 
+											".$this->posted_at.",
+											".$this->last_update."
+									FROM ".Config::get('post_relation')."
+									WHERE board_id = ".intval($this->board_id);
+		//die($query);
 		if (Database::singleton()->query($query))
 		{
 			// This could/should? be done by a MySQL trigger
-			if (!is_null($thread_id))
+			if (!is_null($thread_id) && strtolower($this->email) != strtolower(Config::get('dont_bump')))
 			{
 				$query = "UPDATE posts SET last_update = ".$this->posted_at." 
 						 WHERE id = ".$thread_id;
@@ -146,10 +161,27 @@ class Post
 		}
 	}
 	
+	private function validatePost()
+	{
+		if (is_null($this->thread_id)) 
+		{
+			return !empty($this->message) && !empty($this->file);
+		}
+		else 
+		{
+			return !empty($this->message);
+		}
+	}
+	
 	public static function deletePost()
 	{
 		$id = func_num_args() == 1 ? func_get_arg(0) : $this->id;
 		return Database::singleton()->query("DELETE FROM posts WHERE id = ".$id);
+	}
+	
+	function hasFile()
+	{
+		return !is_null($this->file);
 	}
 	
 	function getId()
@@ -177,6 +209,11 @@ class Post
 		return $this->name;
 	}
 	
+	function getTripecode()
+	{
+		return $this->tripecode;
+	}
+	
 	function getEmail()
 	{
 		return $this->email;
@@ -200,6 +237,11 @@ class Post
 	function getIp()
 	{
 		return $this->ip;
+	}
+	
+	function getDate()
+	{
+		return date(Config::get('date_format'), $this->posted_at);
 	}
 	
 }

@@ -35,15 +35,14 @@ class Section
 		   while ($stmt->fetch()) {
 		       $boards[] = new Board($id);
 		   }
-			
+
 			$boards[0]->getName();
-			
-	   
+
 			/* close statement */
 		   $stmt->close();
 		}
 		$this->boards = $boards;
-
+		
 		return $this->boards;
 	}
 	
@@ -83,7 +82,8 @@ class Section
 					FROM ".Config::get('section_relation')."
 					WHERE id = ".$this->id;
 		
-		if ($result = Database::singleton()->query($query)) {
+		if ($result = Database::singleton()->query($query)) 
+		{
 			
 			while ($row = $result->fetch_assoc()) 
 			{
