@@ -6,129 +6,232 @@ going to spend my time on fixing it - right now.
 */
 class Writer
 {
-	static function thread($threadId)
+	static function thread($threadId, $short = false)
 	{
-		$thread	=	new Thread($threadId);
-		$output =	'';
-		$i		= 	1;
+		$thread			=	new Thread($threadId);
+		$posts			=	$thread->posts();
+		$output 		=	'';
+		$i				= 	1;
+		$omitted_posts	=	0;
+		$omitted_images	=	0;
 		
-		//$output	.=	'<div id="'.$thread->getId().'">';
-		
-		foreach ($thread->posts() as $post)
+		if ($short)
 		{
-			/*
-			if ($i == 2)
+			$all_posts 		= $posts;
+			
+			$old_size		=	count($posts);
+			array_splice($posts, 1, -Config::get('thread_length'));
+			$omitted_posts	= $old_size - count($posts);
+			
+			// Hack - find the number of omitted images
+			$omitted = array_diff($all_posts, $posts);
+			foreach ($omitted as $post)
 			{
-				$output .=	'<div class="secondpost">';
+				if ($post->hasFile())
+				{
+					++$omitted_images;
+				}
 			}
-			else 
-			{
-				$output .=	'<div class="post">';
-			}
-			*/
+		}
+		
+		foreach ($posts as $post)
+		{
 			
 			if ($i == 1) 
 			{
-				$output	.=	self::firstPost($thread, $post);	
+				$output	.=	self::post($thread, $post, true, $short);
+				
+				if	($omitted_posts > 0)
+				{
+					$output	.=	'<span class="omittedposts">';
+					$output	.=	sprintf(Language::get('post:omitted'), $omitted_posts, $omitted_images);
+					$output	.=	'</span>';
+				}
 			}
 			else 
 			{
-				$output	.=	self::nthPost($thread, $post);
+				$output	.=	self::post($thread, $post, false, $short);
 			}
 			
 			++$i;
 		}
 		
-		//$output	.=	'</div>';
-				
 		return $output;
 	}
 	
-	static function firstPost(Thread $thread, Post $post)
+	static function post(Thread $thread, Post $post, $first_post = false, $short = false)
 	{
 		$image = $post->getFile();
 		
-		$output	.=	"\n\n\n\n";
+		if (!$first_post)
+		{
+			$output	.=	'<table><tbody><tr>';
+			$output	.=	'<td class="doubledash">&gt;&gt;</td>';
+			$output	.=	'<td class="reply" id="reply'.$post->getId().'"><a name="'.$post->getId().'"></a> <label><input type="checkbox" name="delete" value="'.$post->getId().'" /> ';
 		
-		//$output .=	'<div class="firstpost">';
-		$output	.=	self::postHeader($post);
+			if ($post->getEmail())
+			{
+				$output	.=	'<a href="mailto:'.$post->getEmail().'">';
+			}
+			
+			$output	.=	'<span class="commentpostername">';
+			$output	.=	$post->getName();
+			$output	.=	'</span>';
+			
+			if ($post->getTripecode()) 
+			{
+				$output	.=	'<span class="postertrip">';
+				$output	.=	'!';
+				$output	.=	$post->getTripecode();
+				$output	.=	'</span>';
+			}
+			
+			if ($post->getEmail())
+			{
+				$output	.=	'</a>';
+			}
 		
-		//$output .=	'<div id="'.$post->getId().'">';
+			$output	.=	$post->getDate().'</label> ';
+			$output	.=	'<span class="reflink"><a href="'.$thread->getReplyURL().'">No.'.$post->getId().'</a></span> &nbsp;<br />';
+		}
 		
-		$output	.= '<a target="_blank" href="'.$image->getURL().'">';
-		$output	.= '<img src="'.$image->getThumbnailURL().'" class="thumb" />';
-		$output	.= '</a>';
+		if (!is_null($image))
+		{
+			$output	.=	self::postHeader($post);
 		
-		$output	.=	'<a name="'.$post->getId().'"></a> <label><input type="checkbox" name="delete" value="'.$post->getId().'" /> ';
-		$output	.=	'<span class="filetitle">'.$post->getTitle().'</span> ';
-		$output .=	'<span class="postername">'.$post->getName().'</span> ';
-		$output	.=	'07/02/14(Wed)12:28</label>';
-		$output	.=	'<span class="reflink"><a href="'.$thread->getReplyURL().'">No.'.$post->getId().'</a></span>';
-		$output	.=	'&nbsp; [<a href="'.$thread->getReplyURL().'">'.Language::get('post:reply').'</a>]';
+			$output	.= '<a target="_blank" href="'.$image->getURL().'">';
+			$output	.= '<img src="'.$image->getThumbnailURL().'" class="thumb" />';
+			$output	.= '</a>';
+		}
+		
+		if ($first_post)
+		{
+			$output	.=	'<a name="'.$post->getId().'"></a> <label><input type="checkbox" name="delete" value="'.$post->getId().'" /> ';
+			$output	.=	'<span class="filetitle">'.$post->getTitle().'</span> ';
+			$output .=	'<span class="postername">'.$post->getName().'</span> ';
+			$output	.=	$post->getDate().'</label> ';
+			$output	.=	'<span class="reflink"><a href="'.$thread->getReplyURL().'">No.'.$post->getId().'</a></span>';
+			$output	.=	'&nbsp; [<a href="'.$thread->getReplyURL().'">'.Language::get('post:reply').'</a>]';
+		}
 		
 		$output	.=	'<blockquote>';
-		$output .= 	'<p>'.$post->getMessage().'</p>';
+		$output .= 	'<p>';
+
+		if (strlen($post->getMessage()) > Config::get('comment_length') && $short)
+		{
+			$output	.=	Parser::boardMessage(substr($post->getMessage(), 0, Config::get('comment_length')));
+			$output	.=	'<div class="abbrev">';
+			$output	.=	Language::get('post:too_long_1');
+			$output	.=	' <a href="'.$thread->getReplyURL().'">'.Language::get('post:too_long_2').'</a> ';
+			$output	.=	Language::get('post:too_long_3');
+			$output	.=	'</div>';
+		}
+		else 
+		{
+			$output .= 	'<p>'.Parser::boardMessage($post->getMessage()).'</p>';
+		}
+		
+		$output	.=	'</p>';
 		$output	.=	'</blockquote>';
 		
-		//$output .=	'</div>';
-		//$output	.=	'</div>';
-		
-		$output	.=	"\n\n\n\n";
+		if (!$first_post)
+		{
+			$output	.=	'</div>';
+			$output	.=	'</td></tr></tbody></table>';
+		}
 		
 		return $output;
 	}
-	
-	static function nthPost(Thread $thread, Post $post)
+
+	static function board(Board $board, $page = 0)
 	{
-		$output	.=	"\n\n\n\n";
-		
-		//$output	.=	'<div style="border: 2px solid red">';
-		
-		$image = $post->getFile();
-		
-		$output	.=	'<table><tbody><tr>';
-		$output	.=	'<td class="doubledash">&gt;&gt;</td>';
-		$output	.=	'<td class="reply" id="reply'.$post->getId().'"><a name="'.$post->getId().'"></a> <label><input type="checkbox" name="delete" value="'.$post->getId().'" /> ';
-		$output	.=	'<span class="commentpostername">'.$post->getName().'</span>';
-		$output	.=	'07/02/14(Wed)12:28</label> ';
-		$output	.=	'<span class="reflink"><a href="'.$thread->getReplyURL().'">No.'.$post->getId().'</a></span> &nbsp;<br />';
-		
-		$output	.=	self::postHeader($post);
-		
-		$output	.= '<a target="_blank" href="'.$image->getURL().'">';
-		$output	.= '<img src="'.$image->getThumbnailURL().'" class="thumb" />';
-		$output	.= '</a>';
-		
-		$output	.=	'<blockquote>';
-		$output .= 	'<p>'.$post->getMessage().'</p>';
-		$output	.=	'</blockquote>';
-		
-		$output	.=	'</div>';
-		
-		$output	.=	'</td></tr></tbody></table>';
-		
-		//$output	.=	'</div>';
-		
-		$output	.=	"\n\n\n\n";
-		
-		return $output;
-	}
-	
-	static function board($boardId)
-	{
-		$board	=	new Board($boardId);
 		$output = '';
 		
-		foreach ($board->threads() as $thread)
+		$amount		=	Config::get('threads_pr_page');
+		$offset		=	$page * $amount;
+		
+		foreach ($board->threads($amount, $offset) as $thread)
 		{
-			$output .=	self::thread($thread->getId());
+			$output .=	self::thread($thread->getId(), true);
 			$output	.=	'<br clear="left" /><hr />';
 		}
 		
 		return $output;
 	}
 	
-	static function menu()
+	static function pager(Board $board, $page = 0)
+	{
+		$page_amout		= ceil($board->getPostAmount() / Config::get('threads_pr_page'));
+		
+		$output	.=	'<table border="1"><tbody><tr>';
+		if ($page == 0)
+		{
+			$output	.=	'<td>';
+			$output	.=	Language::get('bottom:previous');
+			$output	.=	'</td>';
+		}
+		else 
+		{
+			$output	.=	'<td>';
+			$output	.=	'<form method="get" action="'.URL::page($board->getId(), $page - 1).'">';
+			$output	.=	'<input value="'.Language::get('bottom:previous').'" type="submit" />';
+			
+			// Soooo ugly - FIXME
+			//foreach ($_GET as $key => $get)
+			//{
+			//	$output	.=	'<input type="hidden" name="'.$key.'" value="'.$value.'" />';
+			//}
+			
+			$output	.=	'</form>';
+			$output	.=	'</td>';
+		}
+		
+		$output	.=	'<td>';
+		
+		for ($i = 0; $i < $page_amout; ++$i)
+		{
+			$output	.=	'&#91;';
+			if ($i == $page)
+			{
+				$output	.=	$i;	
+			}
+			else 
+			{
+				$output	.=	'<a href="'.URL::page($board->getId(), $i).'">'.$i.'</a>';
+			}
+			$output	.=	'&#93;';
+		}
+			
+		$output	.=	'</td>';
+		
+		if ($page == $page_amout-1)
+		{
+			$output	.=	'<td>';
+			$output	.=	Language::get('bottom:next');
+			$output	.=	'</td>';
+		}
+		else 
+		{
+			$output	.=	'<td>';
+			$output	.=	'<form method="get" action="'.URL::page($board->getId(), $page + 1).'">';
+			$output	.=	'<input value="'.Language::get('bottom:next').'" type="submit" />';
+			
+			// Soooo ugly - FIXME
+			//foreach ($_GET as $key => $get)
+			//{
+			//	$output	.=	'<input type="hidden" name="'.$key.'" value="'.$value.'" />';
+			//}
+			
+			$output	.=	'</form>';
+			$output	.=	'</td>';
+		}
+		
+		$output	.=	'</tr></tbody></table>';
+		
+		return $output;
+	}
+	
+	static function menu($dirs = false)
 	{
 		$query		=	"SELECT * FROM ".Config::get('section_relation');
 		$sections	= array();
@@ -151,7 +254,7 @@ class Writer
 		$output	.=	'<h1>4chandk</h1>';
 		$output .=	'<ul>';
 		$output .=	'<li><a href="http://127.0.0.1" target="_top">Front Page</a></li>';
-		$output	.=	'<li><a target="_self" href="?showdirs">[Show Directories]</a></li>';
+		$output	.=	'<li><a target="_self" href="?p=menu&showdirs">[Show Directories]</a></li>';
 		$output .=	'</ul>';
 		
 		foreach ($sections as $section)
@@ -168,6 +271,7 @@ class Writer
 			{
 				$output .=	'<li>';
 				$output	.=	'<a href="?p=board&id='.$board->getId().'" target="main">';
+				
 				$output .=	$board->getName();
 				$output	.=	'</a>';
 				$output .= 	'</li>';
@@ -180,28 +284,18 @@ class Writer
 		return $output;
 	}
 	
-	static function form($boardId, $destination = null)
+	static function form(Board $board)
 	{
 		$destination = is_null($destination) ? $_SERVER['PHP_SELF'] : $destination;
-		/*	
-		$output .= '<form action="'.$destination.'" method="post" enctype="multipart/form-data" />';
 		
-		if (!Config::get('fored_anonymous'))
+		// not good
+		if (isset($_GET['thread_id']))
 		{
-			$output .= '<div><span>'.Language::get('form:name').'</span><input type="text" name="name" size="28" maxlength="75" /></div>';
-			$output .= '<div><span>'.Language::get('form:email').'</span><input type="text" name="email" size="28" maxlength="75" /></div>';
+			$output	.=	'[<a href="'.$board->getURL().'">'.Language::get('top:return').'</a>]';
+			$output	.=	'<div class="theader">'.Language::get('top:mode').'</div>';
 		}
 		
-		$output .= '<div><span>'.Language::get('form:subject').'</span><input type="text" name="subject" size="35" maxlength="75" />';
-		$output .= '<input type="submit" name="submit" value="'.Language::get('form:submit').'" /></div>';
-		$output .= '<div><span>'.Language::get('form:message').'</span><textarea name="message" cols="48" rows="4"></textarea></div>';
-		$output .= '<div><span>'.Language::get('form:file').'</span><input type="file" name="file" size="35" /></div>';
-		$output .= '</div><span>'.Language::get('form:password').'</span><input type="password" name="password" size="8" /></div>';
-		$output .= '</form>';
-		
-		return $output;
-		*/
-		$output .= '<form action="'.$destination.'?p=board&id='.$boardId.'" method="post" enctype="multipart/form-data" />';
+		$output .= '<form action="'.URL::current().'" method="post" enctype="multipart/form-data" />';
 		$output	.=	'<table><tbody><tr>';
 		
 		if (!Config::get('fored_anonymous'))
@@ -222,27 +316,28 @@ class Writer
 		$output	.=	'</tr><tr>';
 		$output	.=	'<td class="postblock">'.Language::get('form:file').'</td>';
 		$output	.=	'<td><input type="file" name="file" size="35" />';
-		$output	.=	'[<label><input type="checkbox" name="nofile" value="on" />'.Language::get('form:nofile').']</label></td>';
+		//$output	.=	'[<label><input type="checkbox" name="nofile" value="on" />'.Language::get('form:nofile').']</label>';
+		$output	.=	'</td>';
 		$output	.=	'</tr><tr>';
 		$output	.=	'<td class="postblock">'.Language::get('form:password').'</td>';
-		$output	.=	'<td><input type="password" name="password" size="8" /> ('.Language::get('form:delete').')</td>';
+		$output	.=	'<td><input type="password" name="password" value="'.mt_rand(100000000, 999999999).'" size="8" /> ('.Language::get('form:delete').')</td>';
 		$output	.=	'</tr><tr>';
 		$output	.=	'<td colspan="2"><div class="rules">';
-		/* the list */
-		$output	.=	'</div></td></tr></tbody></table>';
+		$output	.=	'</div>';
+		
+		$output	.=	'<div class="rules">';
+		$output	.=	'<ul>';
+		$output	.=	'<li>Supported file types are: GIF, JPG, PNG</li>';
+		$output	.=	'<li>Maximum file size allowed is '.$board->getFilesizeInKB().' KB.</li>';
+		$output	.=	'<li>Images greater than '.Config::get('image_max_width').'x'.Config::get('image_max_height').' pixels will be thumbnailed.</li>';
+		$output	.=	'<li>'.$board->getDescription().'</li>';
+		$output	.=	'</ul>';
+		$output	.=	'</div>';
+		
+		$output	.=	'</td></tr></tbody></table>';
 		$output	.=	'</form>';
 		
 		return $output;
-		
-		/*
-		<ul>
-		<li>Supported file types are: GIF, JPG, PNG</li>
-		<li>Maximum file size allowed is 2048 KB.</li>
-		<li>Images greater than 200x200 pixels will be thumbnailed.</li>
-		<li>This board is for the posting of anime and other
-		crossover/parody images and comics.</li>
-		</ul>
-		*/
 	}
 
 	static function headerStart()
@@ -348,9 +443,105 @@ class Writer
     	return $output;
 	}
 	
-	static function boardTop()
+	static function boardJavascript()
 	{
+		$output	.=	'<script type="text/javascript">var style_cookie="wakabastyle";</script>';
+		$output	.=	'<script type="text/javascript" src="'.Config::get('javascript_url').'"></script>';
 		
+		return $output;
+	}
+	
+	static function navigationBar()
+	{
+		$query		=	"SELECT * FROM ".Config::get('section_relation');
+		$sections	= array();
+		$output = '';
+		
+		if ($result = Database::singleton()->query($query)) {
+			
+			while ($row = $result->fetch_assoc()) 
+			{
+				$section	=	array();
+				foreach ($row as $key => $value)
+				{
+					$section[$key]	= $value;
+				}
+				$sections[]	=	new Section($row['id']);
+				end($sections)->setData($section);
+			}
+		}
+		
+		$output	.=	'<div class="navbar">';
+		
+		foreach ($sections as $section)
+		{
+			$output	.=	'[';
+
+			$not_first_rund	= false;
+			foreach ($section->boards() as $board)
+			{
+				if ($not_first_rund)
+				{
+					$output	.=	' / ';
+					$not_first_rund	= true;
+				}
+				
+				$output	.=	'<a href="'.URL::board($board->getId()).'" title="'.$board->getName().'">'.$board->getDirectory().'</a>';
+				$not_first_rund	= true;
+			}
+			
+			$output	.=	']';
+		}
+		
+		$output	.=	'</div>';
+		
+		return $output;
+	}
+	
+	static function boardTop(Board $board)
+	{
+		$output	.= self::navigationBar();
+		
+		
+		$output	.=	'<div class="adminbar">  ';
+		$output	.=	'[<a href="javascript:set_stylesheet(\'Burichan\')">Burichan</a>]  ';
+		$output	.=	'[<a href="javascript:set_stylesheet(\'Futaba\')">Futaba</a>]  ';
+		$output	.=	'[<a href="javascript:set_stylesheet(\'Gurochan\')">Gurochan</a>]  ';
+		$output	.=	'[<a href="javascript:set_stylesheet(\'Photon\')">Photon</a>]  - ';
+		$output	.=	'[<a href="'.URL::home().'" target="_top">'.Language::get('top:home').'</a>] ';
+		$output	.=	'[<a href="'.URL::admin().'">'.Language::get('top:manage').'</a>] ';
+		$output	.=	'</div> ';
+		
+		$output	.=	'<div class="logo">';
+		$output	.=	'<img src="'.URL::banner($board).'" alt="iiChan - Female/Female" /><br />';
+		$output	.=	$board->getName();
+		$output	.=	'</div>';
+		$output	.=	'<hr />';
+		
+		return $output;
+	}
+	
+	static function boardBottom(Board $board)
+	{
+		$output	.=	'<table class="userdelete"><tbody><tr><td>';
+		$output	.=	Language::get('bottom:delete_post').' ';
+		$output	.=	'[<label><input type="checkbox" name="fileonly" value="on" />'.Language::get('bottom:file_only').'</label>]';
+		$output	.=	'<br>'.Language::get('bottom:password').' ';
+		$output	.=	'<input type="password" name="postpassword" size="8" />&nbsp;';
+		$output	.=	'<input name="deletepost" value="'.Language::get('bottom:delete').'" type="submit" />';
+		$output	.=	'<input name="reportpost" value="'.Language::get('bottom:report').'" type="submit" />';
+		$output	.=	'</td></tr></tbody></table></form>';
+		$output	.=	'<script type="text/javascript">set_delpass("delform")</script>';
+
+		$output	.=	self::pager($board, intval($_GET['page']));
+		
+		$output	.=	'<br />';
+		
+		$output	.=	self::navigationBar();
+		
+		$output	.=	'<p class="footer">- <a href="http://code.google.com/p/4chandk/" target="_top">4chandk</a> Created by <a href="http://www.bottiger.com/" target="_top">Bottiger</a> - Delete this if you want, I don\'t care, this is board is not under some nazilicense<br>Took 0.25s</p>';
+
+		return $output;
 	}
 	
 	private static function postHeader(Post $post)

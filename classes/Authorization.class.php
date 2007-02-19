@@ -3,6 +3,7 @@ class Authorization
 {
 	static function isBanned(Board $board)
 	{
+			
 		$query	=	"SELECT ip, expire 
 					WHERE ip = '".$_SERVER['REMOTE_ADDR']."' 
 					AND expire > ".time();

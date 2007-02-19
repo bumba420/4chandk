@@ -21,7 +21,7 @@ class Thread
 		if (is_null($this->posts))
 		{
 			$posts = array();
-			$query = "SELECT id, board_id, title, name, email, message, password, filename 
+			$query = "SELECT id, board_id, title, name, tripecode, email, message, password, posted_at, filename 
 					  FROM ".Config::get('post_relation')." 
 					  WHERE thread_id = ".$this->thread_id." 
 					  OR id = ".$this->thread_id." 
@@ -29,11 +29,21 @@ class Thread
 
 			$stmt = Database::singleton()->prepare($query);
 			$stmt->execute();
-			$stmt->bind_result($id, $board_id, $title, $name, $email, $message, $password, $file);
+			$stmt->bind_result($id, $board_id, $title, $name, $tripecode, $email, $message, $password, $posted_at, $file);
 		
 			while ($stmt->fetch())
 			{
-				$posts[] = new Post($id, $this->thread_id, $board_id, $title, $name, $email, $message, $password, $file);
+				$posts[] = new Post($id, 
+									$this->thread_id, 
+									$board_id, 
+									stripslashes($title), 
+									stripslashes($name), 
+									stripslashes($tripecode),
+									stripslashes($email), 
+									stripslashes($message), 
+									stripslashes($password), 
+									$posted_at,
+									stripslashes($file));
 			}
 		
 			$this->first_post	= $posts[0];
@@ -89,7 +99,8 @@ class Thread
 	
 	function getReplyURL()
 	{
-		return '?thread='.$this->thread_id.'&mode=reply';
+		// FIXME
+		return '?p=board&id='.$_GET['id'].'&thread_id='.$this->thread_id;
 	}
 }
 ?>

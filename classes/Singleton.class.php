@@ -23,7 +23,10 @@ abstract class Singleton
    
    public static function set($key, $val)
    {
-       self::$data[$key] = $val;
+    	if (empty(self::$data[$key]))
+    	{
+    		self::$data[$key] = $val;
+    	}
    }
    
    public function __clone()

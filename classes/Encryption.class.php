@@ -7,8 +7,8 @@ class Encryption
 {
 	static function tripecode($string)
 	{
-		$hash = Config::get('tripecode_hash');
-		return base64_encode($hash($string, true));
+		$hash 	=	Config::get('tripecode_hash');
+		return substr(base64_encode($hash($string)), 0, Config::get('tripecode_length'));
 	}
 	
 	static function secureTripecode($string)

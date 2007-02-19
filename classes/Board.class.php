@@ -4,11 +4,14 @@ class Board {
 	private  $id				=	0;
 	private  $name				=	'';
 	private  $description		= 	'';
-	private  $directory			=	'';
+	private  $dir				=	'';
+	private  $filesize			=	0;
 	private  $banner			=	'';
 	
 	private  $threads 			= 	array();
 	private  $section_id		=	NULL;
+	private	 $section_name		=	'';
+	private  $post_amount		=	NULL;
 	
 	private  $data				=	false;
 	
@@ -56,9 +59,24 @@ class Board {
 	
 	private function getData()
 	{
-		$query	=	"SELECT section_id, name, dir, description, banner 
-					FROM ".Config::get('board_relation')."
-					WHERE id = ".$this->id;
+		$query	=	"SELECT board.id,
+							board.section_id, 
+							board.name, 
+							board.dir, 
+							board.description, 
+							board.filesize,
+							board.banner,
+							section.name AS section_name,
+							COUNT(*) AS post_amount
+					FROM ".Config::get('board_relation')." AS board,
+					".Config::get('section_relation')." AS section,
+					".Config::get('post_relation')." AS post
+					WHERE board.id = ".$this->id." 
+					AND board.id = post.board_id 
+					AND post.thread_id IS NULL
+					AND board.section_id = section.id 
+					GROUP BY section_id
+					LIMIT 0 , ".Config::get('threads_pr_board');
 
 		if ($result = Database::singleton()->query($query)) {
 			
@@ -70,6 +88,10 @@ class Board {
 			}
 	  
 			$this->data		= true;
+		}
+		else 
+		{
+			die("Error:".Database::singleton()->error.'<hr />'.$query);
 		}
 	}
 	
@@ -93,7 +115,36 @@ class Board {
 	function getDirectory()
 	{
 		if (!$this->data) {	$this->getData(); }
-		return $this->directory;
+		return $this->dir;
+	}
+	
+	function getBanner()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->banner;
+	}
+	
+	function getSectionName()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->section_name;
+	}
+	
+	function getFilesizeInKB()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->filesize / 1024;
+	}
+	
+	function getPostAmount()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->post_amount;
+	}
+	
+	function getURL()
+	{
+		return URL::board($this->id);
 	}
 }
 ?>
