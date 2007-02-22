@@ -36,4 +36,17 @@ Language::set('bottom:file_only',	'File Only');
 Language::set('bottom:password',	Language::get('form:password'));
 Language::set('bottom:delete',		'Delete');
 Language::set('bottom:report',		'Report');
+
+// Manage
+Language::set('manage:board_name',				'Board Name');
+Language::set('manage:board_directory',			'Board Directory');
+Language::set('manage:board_description',		'Description');
+Language::set('manage:board_filesize',			'Maximum filesize');
+Language::set('manage:board_banner',			'Name of banner file, or URL to a remote image');
+Language::set('manage:board_threads_page',		'Threads pr page');
+Language::set('manage:board_threads_board',		'Maximum number of threads pr board');
+Language::set('manage:board_forced_anonymous',	'Forced anonymous?');
+Language::set('manage:board_comment_length ',	'Number of charecters before a post gets abbreviated');
+Language::set('manage:board_thread_length',		'Number of posts from each thread which is shown on the board');
+Language::set('manage:submit',					'Update/Create');
 ?>
