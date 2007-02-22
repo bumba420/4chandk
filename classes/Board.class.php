@@ -7,6 +7,11 @@ class Board {
 	private  $dir				=	'';
 	private  $filesize			=	0;
 	private  $banner			=	'';
+	private  $threads_page		=	0;
+	private  $threads_board		=	0;
+	private  $forced_anonymous	=	false;
+	private  $comment_length	=	0;
+	private  $thread_length		=	0;
 	
 	private  $threads 			= 	array();
 	private  $section_id		=	NULL;
@@ -57,6 +62,11 @@ class Board {
 		return Database::singleton()->query("DELETE FROM ".Config::get('post_relation')." WHERE theard_id = ".$id." OR id = ".$id);
 	}
 	
+	function setData()
+	{
+		$this->data		=	true;
+	}
+	
 	private function getData()
 	{
 		$query	=	"SELECT board.id,
@@ -66,6 +76,11 @@ class Board {
 							board.description, 
 							board.filesize,
 							board.banner,
+							board.threads_page,
+							board.threads_board,
+							board.forced_anonymous,
+							board.comment_length,
+							board.thread_length,
 							section.name AS section_name,
 							COUNT(*) AS post_amount
 					FROM ".Config::get('board_relation')." AS board,
@@ -128,6 +143,36 @@ class Board {
 	{
 		if (!$this->data) {	$this->getData(); }
 		return $this->section_name;
+	}
+	
+	function getThreadsPrPage()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->threads_page;
+	}
+	
+	function getThreadsPrBoard()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->threads_board;
+	}
+	
+	function getForcedAnonymous()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->forced_anonymous;
+	}
+	
+	function getCommentLength()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->comment_length;
+	}
+	
+	function getThreadLength()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->thread_length;
 	}
 	
 	function getFilesizeInKB()

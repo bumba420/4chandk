@@ -6,7 +6,7 @@ going to spend my time on fixing it - right now.
 */
 class Writer
 {
-	static function thread($threadId, $short = false)
+	static function thread(Board $board, $threadId, $short = false)
 	{
 		$thread			=	new Thread($threadId);
 		$posts			=	$thread->posts();
@@ -20,7 +20,7 @@ class Writer
 			$all_posts 		= $posts;
 			
 			$old_size		=	count($posts);
-			array_splice($posts, 1, -Config::get('thread_length'));
+			array_splice($posts, 1, - $board->getThreadLength());
 			$omitted_posts	= $old_size - count($posts);
 			
 			// Hack - find the number of omitted images
@@ -39,7 +39,7 @@ class Writer
 			
 			if ($i == 1) 
 			{
-				$output	.=	self::post($thread, $post, true, $short);
+				$output	.=	self::post($board, $thread, $post, true, $short);
 				
 				if	($omitted_posts > 0)
 				{
@@ -50,7 +50,7 @@ class Writer
 			}
 			else 
 			{
-				$output	.=	self::post($thread, $post, false, $short);
+				$output	.=	self::post($board, $thread, $post, false, $short);
 			}
 			
 			++$i;
@@ -59,7 +59,7 @@ class Writer
 		return $output;
 	}
 	
-	static function post(Thread $thread, Post $post, $first_post = false, $short = false)
+	static function post(Board $board, Thread $thread, Post $post, $first_post = false, $short = false)
 	{
 		$image = $post->getFile();
 		
@@ -117,9 +117,9 @@ class Writer
 		$output	.=	'<blockquote>';
 		$output .= 	'<p>';
 
-		if (strlen($post->getMessage()) > Config::get('comment_length') && $short)
+		if (strlen($post->getMessage()) > $board->getCommentLength() && $short)
 		{
-			$output	.=	Parser::boardMessage(substr($post->getMessage(), 0, Config::get('comment_length')));
+			$output	.=	Parser::boardMessage(substr($post->getMessage(), 0, $board->getCommentLength()));
 			$output	.=	'<div class="abbrev">';
 			$output	.=	Language::get('post:too_long_1');
 			$output	.=	' <a href="'.$thread->getReplyURL().'">'.Language::get('post:too_long_2').'</a> ';
@@ -147,12 +147,12 @@ class Writer
 	{
 		$output = '';
 		
-		$amount		=	Config::get('threads_pr_page');
+		$amount		=	$board->getThreadsPrPage();
 		$offset		=	$page * $amount;
 		
 		foreach ($board->threads($amount, $offset) as $thread)
 		{
-			$output .=	self::thread($thread->getId(), true);
+			$output .=	self::thread($board, $thread->getId(), true);
 			$output	.=	'<br clear="left" /><hr />';
 		}
 		
@@ -161,7 +161,7 @@ class Writer
 	
 	static function pager(Board $board, $page = 0)
 	{
-		$page_amout		= ceil($board->getPostAmount() / Config::get('threads_pr_page'));
+		$page_amout		= ceil($board->getPostAmount() / $board->getThreadsPrPage());
 		
 		$output	.=	'<table border="1"><tbody><tr>';
 		if ($page == 0)
@@ -175,12 +175,6 @@ class Writer
 			$output	.=	'<td>';
 			$output	.=	'<form method="get" action="'.URL::page($board->getId(), $page - 1).'">';
 			$output	.=	'<input value="'.Language::get('bottom:previous').'" type="submit" />';
-			
-			// Soooo ugly - FIXME
-			//foreach ($_GET as $key => $get)
-			//{
-			//	$output	.=	'<input type="hidden" name="'.$key.'" value="'.$value.'" />';
-			//}
 			
 			$output	.=	'</form>';
 			$output	.=	'</td>';
@@ -216,12 +210,6 @@ class Writer
 			$output	.=	'<form method="get" action="'.URL::page($board->getId(), $page + 1).'">';
 			$output	.=	'<input value="'.Language::get('bottom:next').'" type="submit" />';
 			
-			// Soooo ugly - FIXME
-			//foreach ($_GET as $key => $get)
-			//{
-			//	$output	.=	'<input type="hidden" name="'.$key.'" value="'.$value.'" />';
-			//}
-			
 			$output	.=	'</form>';
 			$output	.=	'</td>';
 		}
@@ -254,7 +242,16 @@ class Writer
 		$output	.=	'<h1>4chandk</h1>';
 		$output .=	'<ul>';
 		$output .=	'<li><a href="http://127.0.0.1" target="_top">Front Page</a></li>';
-		$output	.=	'<li><a target="_self" href="?p=menu&showdirs">[Show Directories]</a></li>';
+		
+		if ($dirs) 
+		{
+			$output	.=	'<li><a target="_self" href="?p=menu">[Hide Directories]</a></li>';
+		}
+		else 
+		{
+			$output	.=	'<li><a target="_self" href="?p=menu&showdirs">[Show Directories]</a></li>';
+		}
+		
 		$output .=	'</ul>';
 		
 		foreach ($sections as $section)
@@ -271,6 +268,13 @@ class Writer
 			{
 				$output .=	'<li>';
 				$output	.=	'<a href="?p=board&id='.$board->getId().'" target="main">';
+				
+				if ($dirs) 
+				{
+					$output	.=	'/';
+					$output .=	$board->getDirectory();
+					$output	.=	'/ ';
+				}
 				
 				$output .=	$board->getName();
 				$output	.=	'</a>';
@@ -298,7 +302,7 @@ class Writer
 		$output .= '<form action="'.URL::current().'" method="post" enctype="multipart/form-data" />';
 		$output	.=	'<table><tbody><tr>';
 		
-		if (!Config::get('fored_anonymous'))
+		if (!$board->getForcedAnonymous())
 		{
 			$output	.=	'<td class="postblock">'.Language::get('form:name').'</td>';
 			$output	.=	'<td><input type="text" name="name" size="28" /></td>';
@@ -513,7 +517,9 @@ class Writer
 		$output	.=	'</div> ';
 		
 		$output	.=	'<div class="logo">';
-		$output	.=	'<img src="'.URL::banner($board).'" alt="iiChan - Female/Female" /><br />';
+		$output	.=	'<img src="'.URL::banner($board).'" alt="'.$board->getName().'" /><br />';
+		$output	.=	'/'.$board->getDirectory().'/';
+		$output	.=	' - ';
 		$output	.=	$board->getName();
 		$output	.=	'</div>';
 		$output	.=	'<hr />';
@@ -539,7 +545,7 @@ class Writer
 		
 		$output	.=	self::navigationBar();
 		
-		$output	.=	'<p class="footer">- <a href="http://code.google.com/p/4chandk/" target="_top">4chandk</a> Created by <a href="http://www.bottiger.com/" target="_top">Bottiger</a> - Delete this if you want, I don\'t care, this is board is not under some nazilicense<br>Took 0.25s</p>';
+		$output	.=	'<p class="footer">- <a href="http://code.google.com/p/4chandk/" target="_top">4chandk</a> Created by <a href="http://www.bottiger.com/" target="_top">Bottiger</a> - Delete this if you want, I don\'t care, this is board is not under some nazilicense</p>';
 
 		return $output;
 	}
