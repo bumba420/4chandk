@@ -1,0 +1,108 @@
+<?php
+function __autoload($class_name) 
+{
+   require_once 'classes/' . $class_name . '.class.php';
+}
+
+// Start the script
+require_once 'config/config.php';
+require_once Config::get('language_folder').'/'.Config::get('language').'.php';
+
+Config::initialize();
+session_start();
+
+if (isset($_POST['password']))
+{
+	$_SESSION['su_password'] = $_POST['password'];
+}
+
+if (Config::get('su_password') != $_SESSION['su_password']) 
+{
+	echo "Please log in:";
+	echo '<form method="post">';
+	echo '<input type="password" name="password" />';
+	echo ' ';
+	echo '<input type="submit" value="login" />';
+	echo '</form>';
+	die();
+}
+
+if (isset($_POST['submit']))
+{
+	// update
+	if (isset($_POST['id']))
+	{
+		//die(var_dump($_POST));
+		$query = "UPDATE ".Config::get('board_relation')."
+					SET name = '".$_POST['name']."',
+						dir = '".$_POST['dir']."',
+						description  = '".$_POST['description']."',
+						filesize = ".$_POST['filesize'].",
+						banner = '".$_POST['banner']."',
+						threads_page = ".$_POST['threads_page'].",
+						threads_board = ".$_POST['threads_board'].",
+						forced_anonymous = ".$_POST['forced_anonymous'].",
+						comment_length = ".$_POST['comment_length'].",
+						thread_length = ".$_POST['thread_length']."
+					WHERE id = ".$_POST['id'];
+	}
+	// insert
+	else 
+	{
+		$query	=	"INSERT INTO ".Config::get('board_relation')."
+					(
+					section_id, 
+					name, 
+					dir, 
+					description, 
+					filesize, 
+					banner, 
+					threads_page, 
+					threads_board, 
+					forced_anonymous,
+					comment_length,
+					thread_length
+					)
+					VALUES
+					(
+					1,
+					'".$_POST['name']."',
+					'".$_POST['dir']."',
+					'".$_POST['description']."',
+					".$_POST['filesize'].",
+					'".$_POST['banner']."',
+					".$_POST['threads_page'].",
+					".$_POST['threads_board'].",
+					".$_POST['forced_anonymous'].",
+					".$_POST['comment_length'].",
+					".$_POST['thread_length']."
+					)";
+	}
+	//die($query);
+	Database::singleton()->query($query);
+}
+
+$board	=	null;
+if (intval($_GET['board']))
+{
+	$board = new Board(intval($_GET['board']));
+}
+
+echo Writer::headerStart();
+echo Writer::boardCSS();
+echo Writer::boardJavascript();
+echo Writer::headerEnd();
+//echo Writer::boardTop($board);
+echo '<center>';
+echo Manage::BoardDefaultForm($board);
+echo '</center>';
+echo '<hr />';
+//echo Writer::board($board, intval($_GET['page']));
+//echo Writer::boardBottom($board);
+echo Manage::listBoards();
+
+echo Writer::footer();
+
+
+
+?>
