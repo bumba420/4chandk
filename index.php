@@ -14,6 +14,7 @@ require_once 'config/config.php';
 require_once Config::get('language_folder').'/'.Config::get('language').'.php';
 
 Config::initialize();
+Authorization::isBanned();
 
 //if new post
 if (isset($_POST['submit'])) 
@@ -103,7 +104,7 @@ elseif (isset($_GET['thread_id']))
 	echo Writer::form($board);
 	echo '</center>';
 	echo '<hr />';
-	echo Writer::thread($_GET['thread_id']);
+	echo Writer::thread($board, $_GET['thread_id']);
 	echo Writer::footer();
 }
 else 

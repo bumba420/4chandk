@@ -5,7 +5,7 @@ class User
 	{
 		if (empty($input_name))
 		{
-			return Config::get('blank_name');
+			return '';
 		}
 		
 		list($name, $secret)	=	explode("#", $input_name, 2);

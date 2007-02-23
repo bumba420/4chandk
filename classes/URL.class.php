@@ -1,15 +1,6 @@
 <?php
 class URL
 {
-	private $siteURL	=	'http://127.0.0.1';
-	
-	/*
-	function __construct($siteURL)
-	{
-		$this->siteURL	=	$siteURL;
-	}
-	*/
-	
 	static function thumbnail($filename)
 	{
 		return Config::get('page_url').Config::get('/tmp/thumbnails').'/'.$filename;
@@ -40,7 +31,7 @@ class URL
 	
 	static function home()
 	{
-		return '';//$this->siteURL;
+		return Config::get('page_url');
 	}
 	
 	static function banner(Board $board)
@@ -50,12 +41,12 @@ class URL
 			return $board->getBanner();
 		}
 		
-		return 'http://kei.iichan.net/bnr/banner.pl';
+		return Config::get('page_url').'images/banners/banner.gif';
 	}
 	
 	static function admin()
 	{
-		return ;
+		return 	Config::get('page_url').'manage.php';
 	}
 }
 ?>

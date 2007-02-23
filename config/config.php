@@ -6,13 +6,19 @@
 
 // Database information
 Config::set('db_server', '127.0.0.1');
-Config::set('db_user', 'bottiger_4chandk');
+Config::set('db_user', '4chan');
 Config::set('db_password', '');
-Config::set('db_database', 'bottiger_4chandk');
+Config::set('db_database', '4chandk');
+
+// Superusers password (may be removed in the future)
+Config::set('su_password',	'whatever');
 
 // Password salt, just something long and random.
 // See http://bottiger.com/stuff/hashes if you want some random data
 Config::set('salt', 'ZEEX8yhVYq80mylg8B5RLzDtnPa3tUclPf51TtsIfwDdaJd3');
+
+// Yes. I'm lazy. This shouldn't be necessary.
+Config::set('page_url',	'http://127.0.0.1/4chan/');
 
 /*
 -------- You May Change These! -----------
@@ -20,9 +26,9 @@ Config::set('salt', 'ZEEX8yhVYq80mylg8B5RLzDtnPa3tUclPf51TtsIfwDdaJd3');
 
 // Page title
 Config::set('page_title', '4chandk');
-Config::set('page_url',	'');
 
 // Default board options
+// note the "DEFAULT" :) these are only used when you create *new* boards.
 Config::set('max_filesize_in_bytes', 2097152); // that is: 2MB
 Config::set('threads_pr_page', 20);
 Config::set('threads_pr_board', 500);
@@ -72,6 +78,7 @@ Config::set('image_url', 'tmp/img');
 Config::set('javascript_url', 'javascript/javascript.js');
 
 // Name of database relations
+Config::set('ban_relation', Config::get('database_prefix').'bans');
 Config::set('board_relation', Config::get('database_prefix').'boards');
 Config::set('post_relation', Config::get('database_prefix').'posts');
 Config::set('section_relation', Config::get('database_prefix').'sections');
