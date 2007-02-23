@@ -27,12 +27,46 @@ if (Config::get('su_password') != $_SESSION['su_password'])
 	die();
 }
 
+if (isset($_GET['delete']))
+{
+	$query	=	"DELETE FROM ".Config::get('section_relation')." WHERE id = ".$_GET['delete'];
+	
+	if ($result = Database::singleton()->query($query)) 
+	{
+		;
+	}
+	else 
+	{
+		die("Error:".Database::singleton()->error.'<hr />'.$query);
+	}
+}
+
+if (isset($_POST['section_submit']))
+{
+	$query	=	"INSERT INTO ".Config::get('section_relation')."
+				(
+				name 
+				)
+				VALUES
+				(
+				'".$_POST['section_id']."'
+				)";
+	
+	if ($result = Database::singleton()->query($query)) 
+	{
+		;
+	}
+	else 
+	{
+		die("Error:".Database::singleton()->error.'<hr />'.$query);
+	}
+}
+
 if (isset($_POST['submit']))
 {
 	// update
 	if (isset($_POST['id']))
 	{
-		//die(var_dump($_POST));
 		$query = "UPDATE ".Config::get('board_relation')."
 					SET section_id = ".$_POST['section_id'].",
 						name = '".$_POST['name']."',
@@ -50,7 +84,6 @@ if (isset($_POST['submit']))
 	// insert
 	else 
 	{
-		//die(var_dump($_POST));
 		$query	=	"INSERT INTO ".Config::get('board_relation')."
 					(
 					section_id, 
@@ -80,7 +113,6 @@ if (isset($_POST['submit']))
 					".$_POST['thread_length']."
 					)";
 	}
-	//die($query);
 	if ($result = Database::singleton()->query($query)) 
 	{
 		;
@@ -101,13 +133,16 @@ echo Writer::headerStart();
 echo Writer::boardCSS();
 echo Writer::boardJavascript();
 echo Writer::headerEnd();
-//echo Writer::boardTop($board);
+
+echo '<center>';
+echo Manage::SectionForm();
+echo '</center>';
+echo '<hr />';
+
 echo '<center>';
 echo Manage::BoardDefaultForm($board);
 echo '</center>';
 echo '<hr />';
-//echo Writer::board($board, intval($_GET['page']));
-//echo Writer::boardBottom($board);
 echo Manage::listBoards();
 
 echo Writer::footer();

@@ -5,10 +5,10 @@
 */
 
 // Database information
-Config::set('db_server', '127.0.0.1');
-Config::set('db_user', '4chan');
-Config::set('db_password', '');
-Config::set('db_database', '4chandk');
+Config::set('db_server', 'mysql19.servage.net');
+Config::set('db_user', 'bottiger_4chandk');
+Config::set('db_password', 'fun4all');
+Config::set('db_database', 'bottiger_4chandk');
 
 // Superusers password (may be removed in the future)
 Config::set('su_password',	'whatever');
@@ -63,8 +63,11 @@ Config::set('database_prefix', '');
 -------- You Shouldn't Change These unless you REALLY KNOW what you're doing! -----------
 */
 
+// For some reason $_SERVER['DOCUMENT_ROOT'] is bugge on some systems
+$path_parts = pathinfo($_SERVER['SCRIPT_FILENAME']);
+
 // Script constants
-Config::set('root_folder', $_SERVER['DOCUMENT_ROOT']);
+Config::set('root_folder', $path_parts['dirname']); // $_SERVER['DOCUMENT_ROOT']);
 Config::set('tmp_folder', Config::get('root_folder').'/tmp');
 Config::set('cache_folder', Config::get('tmp_folder').'/cache');
 Config::set('image_folder', Config::get('tmp_folder').'/img');

@@ -49,6 +49,25 @@ class Manage extends Writer
 		}
 	}
 	
+	static function SectionForm()
+	{
+		$output .= '<form action="'.URL::current().'" method="post" enctype="multipart/form-data" />';
+		$output	.=	'<table><tbody><tr>';
+		$output	.=	'<td class="postblock">'.Language::get('manage:section').'</td>';
+		$output	.=	'<td><input type="text" name="section_id" value="'.$values['section_id'].'" size="35" /></td>';
+		
+		$output	.=	'</tr><tr>';
+		
+		$output	.=	'<td class="postblock">'.Language::get('manage:section_submit').'</td>';
+		$output	.=	'<td><input type="submit" name="section_submit" value="'.Language::get('manage:section_submit').'" /></td>';
+		$output	.=	'</tr><tr>';
+		
+		$output	.=	'</td></tr></tbody></table>';
+		$output	.=	'</form>';
+		
+		return $output;
+	}
+	
 	static function BoardForm($values)
 	{
 		$destination = $_SERVER['PHP_SELF'];
@@ -154,6 +173,7 @@ class Manage extends Writer
 		{
 			$output	.=	'<div class="postblock"">';
 			$output	.=	$section->getName();
+			$output	.=	' - <a href="?delete='.$section->getId().'">Delete</a>';
 			$output	.=	'</div>';
 			
 			foreach ($section->boards() as $board)
