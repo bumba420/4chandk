@@ -50,4 +50,6 @@ Language::set('manage:board_forced_anonymous',	'Forced anonymous?');
 Language::set('manage:board_comment_length ',	'Number of charecters before a post gets abbreviated');
 Language::set('manage:board_thread_length',		'Number of posts from each thread which is shown on the board');
 Language::set('manage:submit',					'Update/Create');
+Language::set('manage:section',					'New Section');
+Language::set('manage:section_submit',			'Create');
 ?>
