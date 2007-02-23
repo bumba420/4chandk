@@ -46,6 +46,13 @@ class Post
 		}
 	}
 	
+	public function __toString() 
+	{
+		// Thanks to SandBender from #php @ freenode
+		// http://us3.php.net/manual/en/language.oop5.magic.php#72532
+		return(get_class($this)."@".$this->__uniqid);
+	}
+	
 	private function getById($id)
 	{
 		$query = "SELECT * FROM ".Config::get('post_relation')." 
@@ -171,7 +178,7 @@ class Post
 		}
 		else 
 		{
-			return !empty($this->message) && $file_validation;
+			return !empty($this->message) || $file_validation;
 		}
 	}
 	

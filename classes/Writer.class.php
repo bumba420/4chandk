@@ -25,6 +25,7 @@ class Writer
 			
 			// Hack - find the number of omitted images
 			$omitted = array_diff($all_posts, $posts);
+
 			foreach ($omitted as $post)
 			{
 				if ($post->hasFile())

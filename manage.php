@@ -27,9 +27,23 @@ if (Config::get('su_password') != $_SESSION['su_password'])
 	die();
 }
 
-if (isset($_GET['delete']))
+if (isset($_GET['delete_section']))
 {
-	$query	=	"DELETE FROM ".Config::get('section_relation')." WHERE id = ".$_GET['delete'];
+	$query	=	"DELETE FROM ".Config::get('section_relation')." WHERE id = ".$_GET['delete_section'];
+	
+	if ($result = Database::singleton()->query($query)) 
+	{
+		;
+	}
+	else 
+	{
+		die("Error:".Database::singleton()->error.'<hr />'.$query);
+	}
+}
+
+if (isset($_GET['delete_board']))
+{
+	$query	=	"DELETE FROM ".Config::get('section_relation')." WHERE id = ".$_GET['delete_board'];
 	
 	if ($result = Database::singleton()->query($query)) 
 	{

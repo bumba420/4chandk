@@ -173,7 +173,8 @@ class Manage extends Writer
 		{
 			$output	.=	'<div class="postblock"">';
 			$output	.=	$section->getName();
-			$output	.=	' - <a href="?delete='.$section->getId().'">Delete</a>';
+			$output	.=	' (SECTION ID = <b>'.$section->getId().'</b>)';
+			$output	.=	' - <a href="?delete_section='.$section->getId().'">Delete</a>';
 			$output	.=	'</div>';
 			
 			foreach ($section->boards() as $board)
@@ -181,6 +182,7 @@ class Manage extends Writer
 				$output	.=	'<div>';
 				$output	.=	'<a href="?board='.$board->getId().'">';
 				$output	.=	$board->getName();
+				$output	.=	' - <a href="?delete_board='.$board->getId().'">Delete</a>';
 				$output	.=	'</a>';
 				$output	.=	'</div>';
 			}
