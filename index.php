@@ -89,7 +89,7 @@ elseif ($_GET['p'] == 'board' && is_null($_GET['thread_id']))
 	}
 	else 
 	{
-		echo "Pick a board";
+		include_once('static/frontpage.html');
 	}
 }
 elseif (isset($_GET['thread_id']))
