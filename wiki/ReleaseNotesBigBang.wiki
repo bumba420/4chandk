@@ -5,7 +5,7 @@
 
 == Before you read==
 *The script may contain errors, these notes may contain errors, everything else may contain errors. However, I release this due to the fact that it works (for me), I won't have time to work on it the next week, and would like the opportunity to get some feedback.*
-*Please, if you have _anything_ to say, don't hesitate to write me an e-mail (bottiger @ gmail.com), or submit a bug: http://code.google.com/p/4chandk/issues/list.*
+*Please, if you have _anything_ to say, don't hesitate to write me an e-mail (bottiger @ gmail.com), or submit a bug: http://code.google.com/p/4chandk/issues/list .*
 
 == How is this for ==
 This release is for testing, playing and debugging only! The board itself should works more or less, but since the admin-panel is more or less non-existing, no caching is done, and the script is very unstable[1] I can't recommend that you use it in real life.
