@@ -64,7 +64,7 @@ Config::set('database_prefix', '');
 */
 
 // Script constants
-Config::set('root_folder', $_SERVER['DOCUMENT_ROOT'].'/4chan');
+Config::set('root_folder', $_SERVER['DOCUMENT_ROOT']);
 Config::set('tmp_folder', Config::get('root_folder').'/tmp');
 Config::set('cache_folder', Config::get('tmp_folder').'/cache');
 Config::set('image_folder', Config::get('tmp_folder').'/img');
