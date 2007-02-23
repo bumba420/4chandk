@@ -8,7 +8,7 @@ class Manage extends Writer
 		$values[0]	=	Config::get('max_filesize_in_bytes');
 		$values[1]	=	Config::get('threads_pr_page');
 		$values[2]	=	Config::get('threads_pr_board');
-		$values[3]	=	Config::get('fored_anonymous');
+		$values[3]	=	intval(Config::get('fored_anonymous'));
 		$values[4]	=	Config::get('comment_length');
 		$values[5]	=	Config::get('thread_length');
 		
@@ -32,6 +32,7 @@ class Manage extends Writer
 		$values[9]		=	$board->getBanner();
 		
 		$values['id']	=	$board->getId();
+		$values['section_id']	=	$board->getSectionId();
 		
 		return $values;
 	}
@@ -60,6 +61,10 @@ class Manage extends Writer
 			$output	.=	'<input type="hidden" value="'.$values['id'].'" name="id" />';
 		}
 		
+		$output	.=	'<td class="postblock">'.Language::get('manage:board_section_id').'</td>';
+		$output	.=	'<td><input type="text" name="section_id" value="'.$values['section_id'].'" size="35" /></td>';
+		
+		$output	.=	'</tr><tr>';
 		$output	.=	'<td class="postblock">'.Language::get('manage:board_name').'</td>';
 		$output	.=	'<td><input type="text" name="name" value="'.$values[6].'" size="35" /></td>';
 		

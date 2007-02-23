@@ -88,14 +88,14 @@ class Post
 		$this->posted_at	=	$posted_at;
 		$this->last_update	=	$this->posted_at;
 		$this->ip			=	$_SERVER['REMOTE_ADDR'];
-
+		
 		if (is_uploaded_file($file['tmp_name']))
 		{
-			$this->file		= 	new Image($file, $this->posted_at*100, 200, 200, 5000000, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
+			$this->file		= 	new Image($file, $this->posted_at*100, Config::get('image_max_width'), Config::get('image_max_height'), new Board($board_id), array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
 		}
 		elseif (is_file(Config::get('image_folder').'/'.$file))
 		{
-			$this->file		= 	new Image(null, $file, 200, 200, 5000000, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
+			$this->file		= 	new Image(null, $file, Config::get('image_max_width'), Config::get('image_max_height'), new Board($board_id), array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
 		}
 
 		$this->data			=	true;
@@ -163,13 +163,15 @@ class Post
 	
 	private function validatePost()
 	{
+		$file_validation	=	is_null($this->file) ? true : $this->file->validate($this->board->filesize, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
+		
 		if (is_null($this->thread_id)) 
 		{
-			return !empty($this->message) && !empty($this->file);
+			return !empty($this->message) && !empty($this->file) && $file_validation;
 		}
 		else 
 		{
-			return !empty($this->message);
+			return !empty($this->message) && $file_validation;
 		}
 	}
 	

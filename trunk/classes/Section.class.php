@@ -16,11 +16,11 @@ class Section
 	
 	public function boards()
 	{
+		
 		/* works */
 		$query = "SELECT id 
 				  FROM ".Config::get('board_relation')."
 				  WHERE section_id = ".$this->id;
-		
 	
 		if ($stmt = Database::singleton()->prepare($query)) {
 
@@ -34,15 +34,17 @@ class Section
 		   /* fetch values */
 		   while ($stmt->fetch()) {
 		       $boards[] = new Board($id);
+		       //end($boards)->getName();
 		   }
 
-			$boards[0]->getName();
+			//$boards[0]->getName();
 
 			/* close statement */
 		   $stmt->close();
 		}
 		$this->boards = $boards;
-		
+		//if ($this->id == 2)
+		//	die("id is 2 ".var_dump($this->boards));
 		return $this->boards;
 	}
 	

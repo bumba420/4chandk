@@ -34,7 +34,8 @@ if (isset($_POST['submit']))
 	{
 		//die(var_dump($_POST));
 		$query = "UPDATE ".Config::get('board_relation')."
-					SET name = '".$_POST['name']."',
+					SET section_id = ".$_POST['section_id'].",
+						name = '".$_POST['name']."',
 						dir = '".$_POST['dir']."',
 						description  = '".$_POST['description']."',
 						filesize = ".$_POST['filesize'].",
@@ -49,6 +50,7 @@ if (isset($_POST['submit']))
 	// insert
 	else 
 	{
+		//die(var_dump($_POST));
 		$query	=	"INSERT INTO ".Config::get('board_relation')."
 					(
 					section_id, 
@@ -65,7 +67,7 @@ if (isset($_POST['submit']))
 					)
 					VALUES
 					(
-					1,
+					".$_POST['section_id'].",
 					'".$_POST['name']."',
 					'".$_POST['dir']."',
 					'".$_POST['description']."',
@@ -79,7 +81,14 @@ if (isset($_POST['submit']))
 					)";
 	}
 	//die($query);
-	Database::singleton()->query($query);
+	if ($result = Database::singleton()->query($query)) 
+	{
+		;
+	}
+	else 
+	{
+		die("Error:".Database::singleton()->error.'<hr />'.$query);
+	}
 }
 
 $board	=	null;

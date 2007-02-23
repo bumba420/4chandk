@@ -45,7 +45,7 @@ class Board {
 		
 			while ($stmt->fetch())
 			{
-				$this->threads[] = new Thread($id);
+				$this->threads[] = new Thread($id, $this->id);
 			}
 		}
 	
@@ -81,18 +81,20 @@ class Board {
 							board.forced_anonymous,
 							board.comment_length,
 							board.thread_length,
+							section.id AS section_id,
 							section.name AS section_name,
-							COUNT(*) AS post_amount
+							(
+								SELECT COUNT(*) 
+								FROM ".Config::get('post_relation')."
+								WHERE board_id = ".$this->id."
+								AND thread_id IS NULL
+							) AS post_amount
 					FROM ".Config::get('board_relation')." AS board,
-					".Config::get('section_relation')." AS section,
-					".Config::get('post_relation')." AS post
+					".Config::get('section_relation')." AS section
 					WHERE board.id = ".$this->id." 
-					AND board.id = post.board_id 
-					AND post.thread_id IS NULL
-					AND board.section_id = section.id 
-					GROUP BY section_id
+					AND board.section_id = section.id
 					LIMIT 0 , ".Config::get('threads_pr_board');
-
+		//die($query);
 		if ($result = Database::singleton()->query($query)) {
 			
 			while ($row = $result->fetch_assoc()) {
@@ -117,7 +119,7 @@ class Board {
 	
 	function getName()
 	{
-		if (!$this->data) {	$this->getData(); }
+		if (!$this->data) {	$this->getData($debug); }
 		return $this->name;
 	}
 	
@@ -137,6 +139,12 @@ class Board {
 	{
 		if (!$this->data) {	$this->getData(); }
 		return $this->banner;
+	}
+	
+	function getSectionId()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->section_id;
 	}
 	
 	function getSectionName()
@@ -179,6 +187,12 @@ class Board {
 	{
 		if (!$this->data) {	$this->getData(); }
 		return $this->filesize / 1024;
+	}
+	
+	function getFilesizeInB()
+	{
+		if (!$this->data) {	$this->getData(); }
+		return $this->filesize;
 	}
 	
 	function getPostAmount()

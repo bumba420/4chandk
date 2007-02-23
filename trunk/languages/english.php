@@ -38,6 +38,7 @@ Language::set('bottom:delete',		'Delete');
 Language::set('bottom:report',		'Report');
 
 // Manage
+Language::set('manage:board_section_id',		'Section ID');
 Language::set('manage:board_name',				'Board Name');
 Language::set('manage:board_directory',			'Board Directory');
 Language::set('manage:board_description',		'Description');

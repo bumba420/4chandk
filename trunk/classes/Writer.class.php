@@ -8,7 +8,7 @@ class Writer
 {
 	static function thread(Board $board, $threadId, $short = false)
 	{
-		$thread			=	new Thread($threadId);
+		$thread			=	new Thread($threadId, $board->getId());
 		$posts			=	$thread->posts();
 		$output 		=	'';
 		$i				= 	1;
@@ -173,7 +173,7 @@ class Writer
 		else 
 		{
 			$output	.=	'<td>';
-			$output	.=	'<form method="get" action="'.URL::page($board->getId(), $page - 1).'">';
+			$output	.=	'<form method="post" action="'.URL::page($board->getId(), $page - 1).'">';
 			$output	.=	'<input value="'.Language::get('bottom:previous').'" type="submit" />';
 			
 			$output	.=	'</form>';
@@ -207,7 +207,7 @@ class Writer
 		else 
 		{
 			$output	.=	'<td>';
-			$output	.=	'<form method="get" action="'.URL::page($board->getId(), $page + 1).'">';
+			$output	.=	'<form method="post" action="'.URL::page($board->getId(), $page + 1).'">';
 			$output	.=	'<input value="'.Language::get('bottom:next').'" type="submit" />';
 			
 			$output	.=	'</form>';
@@ -241,7 +241,7 @@ class Writer
 		
 		$output	.=	'<h1>4chandk</h1>';
 		$output .=	'<ul>';
-		$output .=	'<li><a href="http://127.0.0.1" target="_top">Front Page</a></li>';
+		$output .=	'<li><a href="?" target="_top">Front Page</a></li>';
 		
 		if ($dirs) 
 		{
@@ -253,9 +253,10 @@ class Writer
 		}
 		
 		$output .=	'</ul>';
-		
+
 		foreach ($sections as $section)
 		{
+			
 			$output .= 	'<h2>';
 			$output .=	'<span class="plus" onclick="toggle(this,\''.$section->getId().'\');" title="Click to show/hide">&minus;</span>';
 			$output	.= 	$section->getName();
@@ -268,6 +269,7 @@ class Writer
 			{
 				$output .=	'<li>';
 				$output	.=	'<a href="?p=board&id='.$board->getId().'" target="main">';
+				
 				
 				if ($dirs) 
 				{

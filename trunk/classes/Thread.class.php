@@ -6,9 +6,10 @@ class Thread
 	private  $first_post		=	NULL;
 	private  $posts				= 	NULL; // does this take up a lot of unneccassry memory?
 	
-	public function __construct($id)
+	public function __construct($thread_id, $board_id)
 	{
-		$this->thread_id = $id;
+		$this->thread_id 	=	$thread_id;
+		$this->board_id		=	$board_id;
 	}
 	
 	private function getData()
@@ -23,8 +24,12 @@ class Thread
 			$posts = array();
 			$query = "SELECT id, board_id, title, name, tripecode, email, message, password, posted_at, filename 
 					  FROM ".Config::get('post_relation')." 
-					  WHERE thread_id = ".$this->thread_id." 
-					  OR id = ".$this->thread_id." 
+					  WHERE 
+					  (
+					  	thread_id = ".$this->thread_id." 
+					  	OR id = ".$this->thread_id."
+					  )
+					  AND board_id = ".$this->board_id."
 					  ORDER BY id ASC";
 
 			$stmt = Database::singleton()->prepare($query);

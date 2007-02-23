@@ -32,7 +32,7 @@ class Image
 	
 	private $validates	= false;
 	
-	public function __construct($image, $filename, $maxWidth, $maxHeight, $maxFilesize, $allowedTypes)
+	public function __construct($image, $filename, $maxWidth, $maxHeight, $board, $allowedTypes)
 	{
 		// Hack, I don't like this
 		if (is_uploaded_file($image['tmp_name']))
@@ -65,7 +65,7 @@ class Image
 		$this->maxWidth		=	$maxWidth;
 		$this->maxHeight	=	$maxHeight;
 
-		if (is_uploaded_file($image['tmp_name']) && $this->validate($maxFilesize, $allowedTypes)) 
+		if (is_uploaded_file($image['tmp_name']) && $this->validate($board->getFilesizeInB(), $allowedTypes)) 
 		{
 			return $this->moveFile($image);
 		}
