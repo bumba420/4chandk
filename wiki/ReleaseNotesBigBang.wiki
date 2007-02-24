@@ -1,7 +1,7 @@
 #labels Featured,Phase-Deploy,Phase-Requirements
 #release notes for 4chandk-24022007
 
-= Release notes for "4chandk - Big Bang". Also known as: 4chandk-24022007 =
+= Release notes for _4chandk-24022007_. Also known as "BigBang" =
 
 == Before you read==
 *The script may contain errors, these notes may contain errors, everything else may contain errors. However, I release this due to the fact that it works (for me), I won't have time to work on it the next week, and would like the opportunity to get some feedback.*
