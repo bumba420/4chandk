@@ -18,6 +18,7 @@ Config::set('su_password',	'whatever');
 Config::set('salt', 'ZEEX8yhVYq80mylg8B5RLzDtnPa3tUclPf51TtsIfwDdaJd3');
 
 // Yes. I'm lazy. This shouldn't be necessary.
+// !!! Remember the slash in the end
 Config::set('page_url',	'http://127.0.0.1/4chan/');
 
 /*
