@@ -21,10 +21,14 @@ class User
 			return Config::get('blank_name');
 		}
 		
-		list($name, $secret)	=	explode("#", $input_name, 2);
-		$tripecode = empty($secret) ? '' : Encryption::secureTripecode($secret);
+		if (strpos($input_name, "#"))
+		{
+			list($name, $secret)	=	explode("#", $input_name, 2);
+			//$tripecode = empty($secret) ? '' : Encryption::secureTripecode($secret);
+			return $name;
+		}
 		
-		return $name;
+		return $input_name;
 	}
 }
 ?>

@@ -96,7 +96,7 @@ class Post
 		$this->last_update	=	$this->posted_at;
 		$this->ip			=	$_SERVER['REMOTE_ADDR'];
 		
-		if (is_uploaded_file($file['tmp_name']))
+		if (isset($file['tmp_name']) && is_uploaded_file($file['tmp_name']))
 		{
 			$this->file		= 	new Image($file, $this->posted_at*100, Config::get('image_max_width'), Config::get('image_max_height'), new Board($board_id), array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
 		}
@@ -137,13 +137,13 @@ class Post
 									SELECT (MAX(id)+1),
 										   	".$thread_id.",
 											".intval($this->board_id).",
-											'".addslashes($this->title)."', 
-											'".addslashes($this->name)."', 
-											'".addslashes($this->tripecode)."', 
-											'".addslashes($this->email)."', 
-											'".addslashes($this->password)."', 
-											'".addslashes($this->message)."', 
-											'".addslashes($filename)."', 
+											'".mysql_real_escape_string($this->title)."', 
+											'".mysql_real_escape_string($this->name)."', 
+											'".mysql_real_escape_string($this->tripecode)."', 
+											'".mysql_real_escape_string($this->email)."', 
+											'".mysql_real_escape_string($this->password)."', 
+											'".mysql_real_escape_string($this->message)."', 
+											'".mysql_real_escape_string($filename)."', 
 											'".$_SERVER['REMOTE_ADDR']."', 
 											".$this->posted_at.",
 											".$this->last_update."
@@ -170,7 +170,8 @@ class Post
 	
 	private function validatePost()
 	{
-		$file_validation	=	is_null($this->file) ? true : $this->file->validate($this->board->filesize, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
+		//$file_validation	=	is_null($this->file) ? true : $this->file->validate($this->board->filesize, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
+		$file_validation	=	!isset($this->file) ? true : $this->file->validate($this->board->filesize, array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF));
 		
 		if (is_null($this->thread_id)) 
 		{

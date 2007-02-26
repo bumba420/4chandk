@@ -119,7 +119,7 @@ class Board {
 	
 	function getName()
 	{
-		if (!$this->data) {	$this->getData($debug); }
+		if (!$this->data) {	$this->getData(); }
 		return $this->name;
 	}
 	

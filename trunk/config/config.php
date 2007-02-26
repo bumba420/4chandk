@@ -5,10 +5,10 @@
 */
 
 // Database information
-Config::set('db_server', '');
-Config::set('db_user', '');
-Config::set('db_password', '');
-Config::set('db_database', '');
+Config::set('db_server', 'mysql19.servage.net');
+Config::set('db_user', 'bottiger_4chandk');
+Config::set('db_password', 'fun4all');
+Config::set('db_database', 'bottiger_4chandk');
 
 // Superusers password (may be removed in the future)
 Config::set('su_password',	'whatever');
@@ -50,7 +50,7 @@ Config::set('language', 'english');
 // Date format
 // see here: http://php.net/manual/en/function.date.php
 // Default is like 4chan: 02/18/07(Sun)02:12:30
-Config::set('date_format', 'm/d/y(D)h:i:s');
+Config::set('date_format', 'm/d/y (D) h:i:s');
 
 // Tripcode options, just write the hash you would like to use.
 // i.e. crypt, md5, sha1, sha512, whatever.

@@ -20,14 +20,6 @@ class Database extends mysqli
 			die(sprintf("Can't connect to database. Error: %s", mysqli_connect_error()));
 		}
    }
-   /*
-   private function __destruct()
-   {
-   		if (!mysqli_connect_errno())
-   		{
-   			$this->close();
-   		}
-   }*/
    
    public function standartQuery($sql)
    {

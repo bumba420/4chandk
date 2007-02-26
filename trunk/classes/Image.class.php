@@ -43,7 +43,7 @@ class Image
 			$this->filetype		=	$type;
 			
 			$full_filename	=	$filename . '.' . $this->extension($image['name']);
-			$filesize 		=	$image['filesize'];
+			$filesize 		=	isset($image['filesize']) ? $image['filesize'] : 0;
 		}
 		else 
 		{
