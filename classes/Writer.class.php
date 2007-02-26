@@ -62,6 +62,7 @@ class Writer
 	
 	static function post(Board $board, Thread $thread, Post $post, $first_post = false, $short = false)
 	{
+		$output		=	'';
 		$image = $post->getFile();
 		
 		if (!$first_post)
@@ -82,7 +83,7 @@ class Writer
 			if ($post->getTripecode()) 
 			{
 				$output	.=	'<span class="postertrip">';
-				$output	.=	'!';
+				$output	.=	' !';
 				$output	.=	$post->getTripecode();
 				$output	.=	'</span>';
 			}
@@ -92,7 +93,7 @@ class Writer
 				$output	.=	'</a>';
 			}
 		
-			$output	.=	$post->getDate().'</label> ';
+			$output	.=	' '.$post->getDate().'</label> ';
 			$output	.=	'<span class="reflink"><a href="'.$thread->getReplyURL().'">No.'.$post->getId().'</a></span> &nbsp;<br />';
 		}
 		
@@ -163,6 +164,7 @@ class Writer
 	static function pager(Board $board, $page = 0)
 	{
 		$page_amout		= ceil($board->getPostAmount() / $board->getThreadsPrPage());
+		$output		=	'';
 		
 		$output	.=	'<table border="1"><tbody><tr>';
 		if ($page == 0)
@@ -293,7 +295,8 @@ class Writer
 	
 	static function form(Board $board)
 	{
-		$destination = is_null($destination) ? $_SERVER['PHP_SELF'] : $destination;
+		$destination = $_SERVER['PHP_SELF'];
+		$output		=	'';
 		
 		// not good
 		if (isset($_GET['thread_id']))
@@ -349,6 +352,8 @@ class Writer
 
 	static function headerStart()
 	{
+		$output		=	'';
+		
 		$output		=	'<html>';
 		$output		.=	'<head>';
 		$output		.= 	'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
@@ -359,6 +364,7 @@ class Writer
 	
 	static function headerEnd()
 	{
+		$output		=	'';
 		$output		.=	'</head>';
 		$output		.=	'<body>';
 		
@@ -372,6 +378,7 @@ class Writer
 	
 	static function footer()
 	{
+		$output		=	'';
 		$output		=	'</body>';
 		$output		.=	'</html>';
 		
@@ -380,6 +387,7 @@ class Writer
 	
 	static function frameset()
 	{
+		$output		=	'';
 		$output		=	'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">';
 		$output		.=	'<html>';
 		$output		.=	'<head><title>'.Config::get('page_title').'</title>';
@@ -397,6 +405,7 @@ class Writer
 	
 	static function menuCSS()
 	{
+		$output		=	'';
 		$output		.=	'<style type="text/css">';
 		$output		.=	'body { font-family: sans-serif; font-size: 75%; background: #ffe }';
 		$output		.=	'a { text-decoration: none; color: #550 }';
@@ -417,6 +426,7 @@ class Writer
 	
 	static function menuJavascript()
 	{
+		$output		=	'';
 		$output		.=	'<script type="text/javascript">';
 		$output		.=	'function toggle(button,area) {';
 		$output		.=	'    var tog=document.getElementById(area);';
@@ -435,6 +445,7 @@ class Writer
 	
 	static function boardCSS()
 	{
+		$output		=	'';
 		$output		.=	'<style type="text/css">';
     	$output		.=	'body { margin: 0; padding: 8px; margin-bottom: auto; } blockquote blockquote { margin-left: 0em } form { margin-bottom: 0px } form .trap { display:none } .postarea { text-align: center } .postarea table { margin: 0px auto; text-align: left } .thumb { border: none; float: left; margin: 2px 20px } .nothumb { float: left; background: #eee; border: 2px dashed #aaa; text-align: center; margin: 2px 20px; padding: 1em 0.5em 1em 0.5em; } .reply blockquote, blockquote :last-child { margin-bottom: 0em } .reflink a { color: inherit; text-decoration: none } .reply .filesize { margin-left: 20px } .userdelete { float: right; text-align: center; white-space: nowrap } .replypage .replylink { display: none }';
     	$output		.=	'.admin { color: purple;    font-weight:normal; }';
@@ -452,6 +463,7 @@ class Writer
 	
 	static function boardJavascript()
 	{
+		$output		=	'';
 		$output	.=	'<script type="text/javascript">var style_cookie="wakabastyle";</script>';
 		$output	.=	'<script type="text/javascript" src="'.Config::get('javascript_url').'"></script>';
 		
@@ -507,6 +519,7 @@ class Writer
 	
 	static function boardTop(Board $board)
 	{
+		$output		=	'';
 		$output	.= self::navigationBar();
 		
 		
@@ -532,6 +545,9 @@ class Writer
 	
 	static function boardBottom(Board $board)
 	{
+		$page	=	isset($_GET['page']) ?	intval($_GET['page']) : 0;
+
+		$output		=	'';
 		$output	.=	'<table class="userdelete"><tbody><tr><td>';
 		$output	.=	Language::get('bottom:delete_post').' ';
 		$output	.=	'[<label><input type="checkbox" name="fileonly" value="on" />'.Language::get('bottom:file_only').'</label>]';
@@ -542,7 +558,7 @@ class Writer
 		$output	.=	'</td></tr></tbody></table></form>';
 		$output	.=	'<script type="text/javascript">set_delpass("delform")</script>';
 
-		$output	.=	self::pager($board, intval($_GET['page']));
+		$output	.=	self::pager($board, $page);
 		
 		$output	.=	'<br />';
 		
@@ -557,6 +573,7 @@ class Writer
 	{
 		// Speed it up a bit
 		$image = $post->getFile();
+		$output		=	'';
 		
 		$output	.=	'<span class="filesize">';
 		$output	.=	Language::get('post:file').': ';

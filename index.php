@@ -3,6 +3,7 @@
 THIS FILE IS A MESS.
 I STILL HAVN'T DESIDED HOW IT SHOULD *LOOK*
 */
+ini_set('error_reporting', E_ALL);
 
 function __autoload($class_name) 
 {
@@ -15,6 +16,9 @@ require_once Config::get('language_folder').'/'.Config::get('language').'.php';
 
 Config::initialize();
 Authorization::isBanned();
+
+//Cache::sweepWholeCache();
+//Cache::setCache('laoeo2l', 'this isuaoeoaeoeuoee a test');
 
 //if new post
 if (isset($_POST['submit'])) 
@@ -59,7 +63,7 @@ if (isset($_POST['submit']))
 	}
 }
 
-if ($_GET['p'] == 'menu')
+if (isset($_GET['p']) && $_GET['p'] == 'menu')
 {
 	echo Writer::headerStart();
 	echo Writer::menuCSS();
@@ -68,11 +72,12 @@ if ($_GET['p'] == 'menu')
 	echo Writer::menu(isset($_GET['showdirs']));
 	echo Writer::footer();
 }
-elseif ($_GET['p'] == 'board' && is_null($_GET['thread_id']))
+elseif (isset($_GET['p']) && $_GET['p'] == 'board' && !isset($_GET['thread_id']))
 {
-	if ($_GET['id'] != 0)
+	if (isset($_GET['id']) && $_GET['id'] != 0)
 	{
-		$board = new Board($_GET['id']);
+		$board 	= new Board($_GET['id']);
+		$page	=	isset($_GET['page']) ?	intval($_GET['page']) : 0;
 		
 		echo Writer::headerStart();
 		echo Writer::boardCSS();
@@ -83,7 +88,7 @@ elseif ($_GET['p'] == 'board' && is_null($_GET['thread_id']))
 		echo Writer::form($board);
 		echo '</center>';
 		echo '<hr />';
-		echo Writer::board($board, intval($_GET['page']));
+		echo Writer::board($board, $page);
 		echo Writer::boardBottom($board);
 		echo Writer::footer();
 	}
