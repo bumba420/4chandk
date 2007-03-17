@@ -70,7 +70,9 @@ $path_parts = pathinfo($_SERVER['SCRIPT_FILENAME']);
 // Script constants
 Config::set('root_folder', $path_parts['dirname']); // $_SERVER['DOCUMENT_ROOT']);
 Config::set('tmp_folder', Config::get('root_folder').'/tmp');
+Config::set('font_folder', Config::get('root_folder').'/font');
 Config::set('cache_folder', Config::get('tmp_folder').'/cache');
+Config::set('captcha_folder', Config::get('tmp_folder').'/captcha');
 Config::set('image_folder', Config::get('tmp_folder').'/img');
 Config::set('thumbnail_folder', Config::get('tmp_folder').'/thumbnails');
 Config::set('language_folder', Config::get('root_folder').'/languages');
